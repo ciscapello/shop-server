@@ -7,5 +7,5 @@ const express_1 = __importDefault(require("express"));
 const products_route_1 = __importDefault(require("./routes/products.route"));
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
-app.use("/api", products_route_1.default);
+app.use('/api', products_route_1.default);
 exports.default = app;

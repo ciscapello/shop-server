@@ -8,10 +8,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getAllProducts = void 0;
+const products_model_1 = __importDefault(require("../models/products.model"));
 const getAllProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    res.status(200).send("HEllo pidar");
+    const products = yield products_model_1.default.find();
+    res.status(200).json({
+        status: 'success',
+        body: products
+    });
 });
 exports.getAllProducts = getAllProducts;
 // export const getProduct = async (req: Request, res: Response) => {
