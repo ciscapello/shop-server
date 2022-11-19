@@ -21,6 +21,8 @@ const productsSchema = new mongoose_1.default.Schema({
         type: String,
         required: [true, 'Image is required field']
     }
+}, {
+    versionKey: false
 });
 const Products = mongoose_1.default.model('Products', productsSchema);
 exports.default = Products;
