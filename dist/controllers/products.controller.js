@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createProduct = exports.getProduct = exports.getAllProducts = void 0;
+exports.updateProduct = exports.deleteProduct = exports.createProduct = exports.getProduct = exports.getAllProducts = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const products_model_1 = __importDefault(require("../models/products.model"));
 const catchAsync_1 = __importDefault(require("../utils/catchAsync"));
@@ -32,11 +32,8 @@ const getProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         product = yield products_model_1.default.findById(req.params.id);
     }
     if (!product) {
-        next(new appError_1.default('HUEVA', 400));
-        // return res.status(400).json({
-        //   status: 'failed',
-        //   body: 'Invalid ID'
-        // });
+        // res.status(400).send('There is no product with this ID');
+        return next(new appError_1.default('There is no product with this ID', 400));
     }
     res.status(200).json({
         status: 'success',
@@ -51,15 +48,29 @@ exports.createProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
         data: newProduct
     });
 }));
-// export const updateProduct = (req: Request, res: Response) => {
-//   res.status(200).json({
-//     status: "success",
-//     data: "This request yet not have response",
-//   });
-// };
-// export const deleteProduct = (req: Request, res: Response) => {
-//   res.status(200).json({
-//     status: "success",
-//     data: "This request yet not have response",
-//   });
-// };
+exports.deleteProduct = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    let product;
+    if (mongoose_1.default.Types.ObjectId.isValid(req.params.id)) {
+        product = yield products_model_1.default.findByIdAndDelete(req.params.id);
+    }
+    if (!product) {
+        return next(new appError_1.default('There is no products with this ID', 404));
+    }
+    res.status(200).json({
+        status: 'success'
+    });
+}));
+const updateProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    let product;
+    if (mongoose_1.default.Types.ObjectId.isValid(req.params.id)) {
+        product = yield products_model_1.default.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    }
+    if (!product) {
+        return next(new appError_1.default('There is no products with this ID', 404));
+    }
+    res.status(200).json({
+        status: 'success',
+        data: product
+    });
+});
+exports.updateProduct = updateProduct;

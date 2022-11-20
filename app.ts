@@ -2,6 +2,8 @@ import express, { Response, Request, NextFunction } from 'express';
 import productsRouter from './routes/products.route';
 import morgan from 'morgan';
 import globalErrorHandler from './controllers/error.controller';
+import AppError from './utils/appError';
+import mongoose from 'mongoose';
 
 const app = express();
 

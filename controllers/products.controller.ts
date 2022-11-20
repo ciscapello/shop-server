@@ -19,11 +19,8 @@ export const getProduct = async (req: Request, res: Response, next: NextFunction
     product = await Products.findById(req.params.id);
   }
   if (!product) {
-    next(new AppError('HUEVA', 400));
-    // return res.status(400).json({
-    //   status: 'failed',
-    //   body: 'Invalid ID'
-    // });
+    // res.status(400).send('There is no product with this ID');
+    return next(new AppError('There is no product with this ID', 400));
   }
   res.status(200).json({
     status: 'success',
@@ -39,16 +36,29 @@ export const createProduct = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-// export const updateProduct = (req: Request, res: Response) => {
-//   res.status(200).json({
-//     status: "success",
-//     data: "This request yet not have response",
-//   });
-// };
+export const deleteProduct = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  let product;
+  if (mongoose.Types.ObjectId.isValid(req.params.id)) {
+    product = await Products.findByIdAndDelete(req.params.id);
+  }
+  if (!product) {
+    return next(new AppError('There is no products with this ID', 404));
+  }
+  res.status(200).json({
+    status: 'success'
+  });
+});
 
-// export const deleteProduct = (req: Request, res: Response) => {
-//   res.status(200).json({
-//     status: "success",
-//     data: "This request yet not have response",
-//   });
-// };
+export const updateProduct = async (req: Request, res: Response, next: NextFunction) => {
+  let product;
+  if (mongoose.Types.ObjectId.isValid(req.params.id)) {
+    product = await Products.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+  }
+  if (!product) {
+    return next(new AppError('There is no products with this ID', 404));
+  }
+  res.status(200).json({
+    status: 'success',
+    data: product
+  });
+};

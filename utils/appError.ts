@@ -1,5 +1,7 @@
 class AppError extends Error {
-  errors(errors: any) {
+  path: any;
+  value: any;
+  errors?(errors: any) {
     throw new Error('Method not implemented.');
   }
   statusCode: number;

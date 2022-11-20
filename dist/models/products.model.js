@@ -7,7 +7,8 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const productsSchema = new mongoose_1.default.Schema({
     name: {
         type: String,
-        required: [true, 'Name is required field']
+        required: [true, 'Name is required field'],
+        unique: true
     },
     price: {
         type: String,
