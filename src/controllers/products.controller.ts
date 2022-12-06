@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
-import Products from '../models/products.model';
-import catchAsync from '../utils/catchAsync';
-import AppError from '../utils/appError';
+import Products from '../models/products.model.js';
+import catchAsync from '../utils/catchAsync.js';
+import AppError from '../utils/appError.js';
 
 export const getAllProducts = async (req: Request, res: Response) => {
   const products = await Products.find();
@@ -19,7 +19,6 @@ export const getProduct = async (req: Request, res: Response, next: NextFunction
     product = await Products.findById(req.params.id);
   }
   if (!product) {
-    // res.status(400).send('There is no product with this ID');
     return next(new AppError('There is no product with this ID', 400));
   }
   res.status(200).json({

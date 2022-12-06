@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import AppError from '../utils/appError';
+import AppError from '../utils/appError.js';
 
 const handleValidationErrorDB = (err: AppError) => {
   const errors = Object.values(err.errors!).map((el) => el.message);
