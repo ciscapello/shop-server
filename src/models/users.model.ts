@@ -1,15 +1,30 @@
-import mongoose from 'mongoose';
+import mongoose, { Model } from 'mongoose';
+import bcrypt from 'bcryptjs';
 
-const usersSchema = new mongoose.Schema(
+interface User {
+  name: string;
+  email: string;
+  role: string;
+  password: string;
+  confirm_password: string;
+}
+
+interface UserMethods {
+  correctPassword: (arg1: string, arg2: string) => Promise<boolean>;
+}
+
+type UserModel = Model<User, {}, UserMethods>;
+
+const usersSchema = new mongoose.Schema<User, UserModel, UserMethods>(
   {
     name: {
       type: String,
-      required: [true, 'Name is required field'],
-      unique: true
+      required: [true, 'Name is required field']
     },
     email: {
       type: String,
-      required: [true, 'Email is required field']
+      required: [true, 'Email is required field'],
+      unique: true
     },
     role: {
       type: String,
@@ -35,6 +50,19 @@ const usersSchema = new mongoose.Schema(
     versionKey: false
   }
 );
+
+usersSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
+
+  this.password = await bcrypt.hash(this.password, 12);
+
+  // this.confirm_password = '';
+  next();
+});
+
+usersSchema.methods.correctPassword = async function (candidatePassword: string, userPassword: string) {
+  return await bcrypt.compare(candidatePassword, userPassword);
+};
 
 const Users = mongoose.model('Users', usersSchema);
 

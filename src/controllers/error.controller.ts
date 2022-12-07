@@ -12,6 +12,12 @@ const handleCastErrorDB = (err: AppError) => {
   return new AppError(message, 400);
 };
 
+const handleDuplicateFieldsDB = (err: AppError) => {
+  console.log(err);
+  const message = `Duplicate field value: ${JSON.stringify(err.keyValue)}. Please use another value!`;
+  return new AppError(message, 400);
+};
+
 const sendErrorDev = (err: AppError, res: Response) => {
   res.status(err.statusCode).json({
     status: err.status,
@@ -37,6 +43,7 @@ const sendErrorProd = (err: AppError, res: Response) => {
 };
 
 const globalErrorHandler = (err: AppError, req: Request, res: Response, next: NextFunction) => {
+  console.log('asdasdassdsd!!!!!!');
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
 
@@ -47,10 +54,9 @@ const globalErrorHandler = (err: AppError, req: Request, res: Response, next: Ne
 
     if (error.name === 'CastError') error = handleCastErrorDB(error);
     if (error.name === 'ValidationError') error = handleValidationErrorDB(error);
-    // if (error.code === 11000) error = handleDuplicateFieldsDB(error);
+    if (error.code === 11000) error = handleDuplicateFieldsDB(error);
     // if (error.name === 'JsonWebTokenError') error = handleJWTError(error);
     // if (error.name === 'TokenExpiredError') error = handleJWTExpiredError(error);
-    // if (error.name === 'ValidationError') error = handleValidationErrorDB(error);
 
     sendErrorProd(error, res);
   }

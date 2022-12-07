@@ -1,9 +1,12 @@
 import express from 'express';
-import { createUser, getUsers } from '../controllers/users.controller.js';
+import { login, signUp } from '../controllers/auth.controller.js';
+import { getUsers, updateUser } from '../controllers/users.controller.js';
 
 const router = express.Router();
 
-router.route('/users').get(getUsers).post(createUser);
-// router.route('/products/:id').get(getProduct).delete(deleteProduct).patch(updateProduct);
+router.route('/users').get(getUsers);
+router.route('/signup').post(signUp);
+router.route('/login').post(login);
+router.route('/users/:id').patch(updateUser);
 
 export default router;

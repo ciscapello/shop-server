@@ -5,8 +5,10 @@ class AppError extends Error {
     throw new Error('Method not implemented.');
   }
   statusCode: number;
+  code?: number;
   status: string;
   isOperational: boolean;
+  keyValue?: { email: 'string' };
   constructor(message: string, statusCode: number) {
     super(message);
 
