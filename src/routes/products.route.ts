@@ -1,4 +1,5 @@
 import express from 'express';
+import { protect } from '../controllers/auth.controller.js';
 import {
   createProduct,
   deleteProduct,
@@ -9,7 +10,11 @@ import {
 
 const router = express.Router();
 
-router.route('/products').get(getAllProducts).post(createProduct);
-router.route('/products/:id').get(getProduct).delete(deleteProduct).patch(updateProduct);
+router.route('/products').get(getAllProducts).post(protect, createProduct);
+router
+  .route('/products/:id')
+  .get(getProduct)
+  .delete(protect, deleteProduct)
+  .patch(protect, updateProduct);
 
 export default router;

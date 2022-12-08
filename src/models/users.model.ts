@@ -19,25 +19,25 @@ const usersSchema = new mongoose.Schema<User, UserModel, UserMethods>(
   {
     name: {
       type: String,
-      required: [true, 'Name is required field']
+      required: [true, 'Name is required field'],
+      unique: false
     },
     email: {
       type: String,
       required: [true, 'Email is required field'],
       unique: true
     },
-    role: {
-      type: String,
-      enum: ['user', 'admin'],
-      default: 'user'
-    },
     password: {
       type: String,
-      required: [true, 'Password is required field']
+      required: [true, 'Password is required field'],
+      select: false,
+      minlength: 8,
+      maxlength: 160
     },
     confirm_password: {
       type: String,
       required: [true, 'Confirm password please'],
+      select: false,
       validate: {
         validator: function (val: string) {
           return val === this.password;
@@ -56,11 +56,17 @@ usersSchema.pre('save', async function (next) {
 
   this.password = await bcrypt.hash(this.password, 12);
 
-  // this.confirm_password = '';
   next();
 });
 
-usersSchema.methods.correctPassword = async function (candidatePassword: string, userPassword: string) {
+usersSchema.post('save', async function (next) {
+  this.confirm_password = '';
+});
+
+usersSchema.methods.correctPassword = async function (
+  candidatePassword: string,
+  userPassword: string
+) {
   return await bcrypt.compare(candidatePassword, userPassword);
 };
 

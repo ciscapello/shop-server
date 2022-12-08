@@ -7,16 +7,8 @@ export const getUsers = catchAsync(async (req: Request, res: Response, next: Nex
 
   res.status(200).json({
     status: 'success',
+    results: users.length,
     body: users
-  });
-});
-
-export const updateUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  const user = await Users.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
-
-  res.status(200).json({
-    status: 'success',
-    body: user
   });
 });
 
