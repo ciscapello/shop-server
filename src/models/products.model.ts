@@ -1,6 +1,13 @@
 import mongoose from 'mongoose';
 
-const productsSchema = new mongoose.Schema(
+interface IProducts {
+  name: string;
+  price: string;
+  in_stock: boolean;
+  images: string[];
+}
+
+const productsSchema = new mongoose.Schema<IProducts>(
   {
     name: {
       type: String,
@@ -15,8 +22,8 @@ const productsSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
-    image_url: {
-      type: String,
+    images: {
+      type: [String],
       required: [true, 'Image is required field']
     }
   },
@@ -25,6 +32,6 @@ const productsSchema = new mongoose.Schema(
   }
 );
 
-const Products = mongoose.model('Products', productsSchema);
+const Products = mongoose.model<IProducts>('Products', productsSchema);
 
 export default Products;

@@ -1,4 +1,4 @@
-import express, { Response, Request, NextFunction } from 'express';
+import express from 'express';
 import productsRouter from './routes/products.route.js';
 import usersRouter from './routes/users.route.js';
 import morgan from 'morgan';
@@ -17,6 +17,8 @@ app.use(express.json({ limit: '10kb' }));
 app.use(mongoSanitize());
 
 app.use(xss());
+
+app.use(express.static('public'));
 
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));

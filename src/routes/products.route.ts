@@ -5,12 +5,13 @@ import {
   deleteProduct,
   getAllProducts,
   getProduct,
-  updateProduct
+  updateProduct,
+  uploadPhoto
 } from '../controllers/products.controller.js';
 
 const router = express.Router();
 
-router.route('/products').get(getAllProducts).post(protect, createProduct);
+router.route('/products').get(getAllProducts).post(protect, uploadPhoto, createProduct);
 router
   .route('/products/:id')
   .get(getProduct)
