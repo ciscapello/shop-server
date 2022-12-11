@@ -7,7 +7,6 @@ import multer, { FileFilterCallback } from 'multer';
 import { transliteration } from '../utils/transliteration.js';
 import * as fs from 'node:fs';
 import { getFiles } from '../utils/getFiles.js';
-import path from 'node:path';
 import { IProducts } from '../models/products.model.js';
 
 type DestinationCallback = (error: Error | null, destination: string) => void;
@@ -66,8 +65,6 @@ export const getProduct = catchAsync(async (req: Request, res: Response, next: N
 });
 
 export const createProduct = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  console.log('req.files', req.files);
-  console.log('req.body', req.body);
   if (!req.files) {
     return next(new AppError('You should provide at least one image', 400));
   }
@@ -81,7 +78,7 @@ export const createProduct = catchAsync(async (req: Request, res: Response, next
   const newProduct = await Products.create(product);
   res.status(200).json({
     status: 'success',
-    data: newProduct
+    data: { newProduct }
   });
 });
 

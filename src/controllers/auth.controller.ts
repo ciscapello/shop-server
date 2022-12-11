@@ -33,7 +33,9 @@ const createSendToken = (
     status: 'success',
     token,
     data: {
-      user
+      name: user.name,
+      email: user.email,
+      id: user._id
     }
   });
 };
@@ -45,8 +47,6 @@ export const signUp = catchAsync(async (req: Request, res: Response, next: NextF
     password: req.body.password,
     confirm_password: req.body.confirm_password
   });
-
-  const token = signToken(newUser._id);
 
   createSendToken(newUser, 201, res);
 });
@@ -88,3 +88,13 @@ export const protect = catchAsync(async (req: Request, res: Response, next: Next
   req.user = currentUser;
   next();
 });
+
+export const restrictTo = (role: string) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    // roles ['admin', 'lead-guide']. role='user'
+    if (role === req.user.role) {
+      return next(new AppError('You do not have permission to perform this action', 403));
+    }
+    next();
+  };
+};
