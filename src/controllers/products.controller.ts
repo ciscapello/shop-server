@@ -42,10 +42,6 @@ const upload = multer({
 
 export const uploadPhoto = upload.array('images', 7);
 
-export const validateBeforeUpload = async (req: Request, res: Response, next: NextFunction) => {
-  next();
-};
-
 export const getAllProducts = catchAsync(async (req: Request, res: Response) => {
   const products = await Products.find();
   res.status(200).json({
@@ -109,14 +105,32 @@ export const deleteProduct = catchAsync(async (req: Request, res: Response, next
 });
 
 export const updateProduct = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  let product;
+  let product: IProducts | null = null;
+  let oldImages;
+  const files = req.files as Express.Multer.File[];
+  let images: string[] = [];
+  files.forEach((elem, i) => {
+    images.push(elem.filename);
+  });
   if (mongoose.Types.ObjectId.isValid(req.params.id)) {
-    product = await Products.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true
-    });
+    let oldProduct = await Products.findById(req.params.id);
+    oldImages = oldProduct?.images;
+    product = await Products.findByIdAndUpdate(
+      req.params.id,
+      { ...req.body, images },
+      {
+        new: true,
+        runValidators: true
+      }
+    );
   }
+  oldImages?.map((elem) => {
+    fs.unlink(`public/img/${elem}`, () => console.log(elem, 'deleted'));
+  });
   if (!product) {
+    files.map((elem) => {
+      fs.unlink(`public/img/${elem.filename}`, () => console.log(elem, 'deleted'));
+    });
     return next(new AppError('There is no products with this ID', 404));
   }
   res.status(200).json({
