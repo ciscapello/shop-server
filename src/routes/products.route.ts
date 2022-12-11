@@ -6,12 +6,16 @@ import {
   getAllProducts,
   getProduct,
   updateProduct,
-  uploadPhoto
+  uploadPhoto,
+  validateBeforeUpload
 } from '../controllers/products.controller.js';
 
 const router = express.Router();
 
-router.route('/products').get(getAllProducts).post(protect, uploadPhoto, createProduct);
+router
+  .route('/products')
+  .get(getAllProducts)
+  .post(protect, validateBeforeUpload, uploadPhoto, createProduct);
 router
   .route('/products/:id')
   .get(getProduct)

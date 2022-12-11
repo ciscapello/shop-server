@@ -5,7 +5,10 @@ import catchAsync from '../utils/catchAsync.js';
 import AppError from '../utils/appError.js';
 import multer, { FileFilterCallback } from 'multer';
 import { transliteration } from '../utils/transliteration.js';
-import sharp from 'sharp';
+import * as fs from 'node:fs';
+import { getFiles } from '../utils/getFiles.js';
+import path from 'node:path';
+import { IProducts } from '../models/products.model.js';
 
 type DestinationCallback = (error: Error | null, destination: string) => void;
 type FileNameCallback = (error: Error | null, filename: string) => void;
@@ -21,11 +24,11 @@ const multerStorage = multer.diskStorage({
 });
 
 const multerFilter = (
-  request: Request,
+  req: Request,
   file: Express.Multer.File,
   callback: FileFilterCallback
 ): void => {
-  if (file.mimetype.startsWith('image')) {
+  if (file.mimetype.startsWith('image') && req.body.name) {
     callback(null, true);
   } else {
     callback(null, false);
@@ -38,6 +41,10 @@ const upload = multer({
 });
 
 export const uploadPhoto = upload.array('images', 7);
+
+export const validateBeforeUpload = async (req: Request, res: Response, next: NextFunction) => {
+  next();
+};
 
 export const getAllProducts = catchAsync(async (req: Request, res: Response) => {
   const products = await Products.find();
@@ -62,9 +69,12 @@ export const getProduct = catchAsync(async (req: Request, res: Response, next: N
   });
 });
 
-export const createProduct = catchAsync(async (req: Request, res: Response) => {
+export const createProduct = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   console.log('req.files', req.files);
   console.log('req.body', req.body);
+  if (!req.files) {
+    return next(new AppError('You should provide at least one image', 400));
+  }
   const product = req.body;
   const images: string[] = [];
   const files = req.files as Express.Multer.File[];
@@ -80,13 +90,19 @@ export const createProduct = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const deleteProduct = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  let product;
+  let product: IProducts | null = null;
   if (mongoose.Types.ObjectId.isValid(req.params.id)) {
     product = await Products.findByIdAndDelete(req.params.id);
   }
   if (!product) {
     return next(new AppError('There is no products with this ID', 404));
   }
+  let images = getFiles(`public/img`);
+  images.forEach((elem) => {
+    if (elem.split('/')[2].startsWith(transliteration(product!.name))) {
+      fs.unlink(elem, () => console.log(elem, 'deleted'));
+    }
+  });
   res.status(200).json({
     status: 'success'
   });

@@ -70,6 +70,6 @@ usersSchema.methods.correctPassword = async function (
   return await bcrypt.compare(candidatePassword, userPassword);
 };
 
-const Users = mongoose.model('Users', usersSchema);
+const Users = mongoose.model<User, UserModel>('Users', usersSchema);
 
 export default Users;
